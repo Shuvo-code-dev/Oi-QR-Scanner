@@ -225,7 +225,9 @@ class HistoryProvider with ChangeNotifier {
     if (resultType == 'url') return 'Web';
     if (resultType == 'phone') return 'Contact';
     if (resultType == 'email') return 'Work';
-    if (content.startsWith('WIFI:')) return 'Network';
+    if (resultType == 'wifi') return 'Network';
+    if (resultType == 'payment') return 'Finance';
+    if (resultType == 'event') return 'Events';
     return 'Other';
   }
 

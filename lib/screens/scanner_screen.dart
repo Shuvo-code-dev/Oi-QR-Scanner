@@ -22,7 +22,7 @@ class ScannerScreen extends StatefulWidget {
 }
 
 class _ScannerScreenState extends State<ScannerScreen> {
-  final MobileScannerController _controller = MobileScannerController();
+  late MobileScannerController _controller;
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isScanModeQR = true;
   bool _isProcessingOCR = false;
@@ -32,10 +32,18 @@ class _ScannerScreenState extends State<ScannerScreen> {
   
   double _zoomFactor = 0.0;
   bool _isFlashOn = false;
+  
+  DateTime? _lastDetectedAt;
+  String? _lastDetectedCode;
+  bool _isPulseActive = false;
 
   @override
   void initState() {
     super.initState();
+    _controller = MobileScannerController(
+      detectionSpeed: DetectionSpeed.unrestricted,
+      formats: [BarcodeFormat.qrCode],
+    );
     _audioPlayer.setSource(AssetSource('audio/beep.mp3'));
   }
 
@@ -124,6 +132,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
     if (barcodes.isNotEmpty) {
       final String? code = barcodes.first.rawValue;
       if (code != null) {
+        // Debounce: ignore same code if detected within 1 second
+        final now = DateTime.now();
+        if (code == _lastDetectedCode && 
+            _lastDetectedAt != null && 
+            now.difference(_lastDetectedAt!).inSeconds < 1) {
+          return;
+        }
+        
+        _lastDetectedCode = code;
+        _lastDetectedAt = now;
         _handleScanSuccess(code);
       }
     }
@@ -135,8 +153,19 @@ class _ScannerScreenState extends State<ScannerScreen> {
     // Feedback
     if (!isOCR) {
       _audioPlayer.resume();
-      HapticFeedback.lightImpact();
+      // Complex Micro-interaction Pattern
+      HapticFeedback.vibrate(); 
+      Future.delayed(const Duration(milliseconds: 80), () => HapticFeedback.heavyImpact());
+      
       _audioPlayer.seek(Duration.zero);
+      
+      // Neon Pulse Trigger
+      if (mounted) {
+        setState(() => _isPulseActive = true);
+        Future.delayed(const Duration(milliseconds: 300), () => setState(() {
+          if (mounted) _isPulseActive = false;
+        }));
+      }
     }
     
     final provider = context.read<HistoryProvider>();
@@ -144,7 +173,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
     // Determine result type
     String resultType = isOCR ? 'text' : 'text';
     if (!isOCR) {
-      if (Uri.tryParse(code)?.hasScheme ?? false) {
+      final codeLow = code.toLowerCase();
+      if (codeLow.startsWith('wifi:')) {
+        resultType = 'wifi';
+      } else if (codeLow.startsWith('upi://') || codeLow.contains('paypal.me') || 
+                 codeLow.startsWith('bitcoin:') || codeLow.startsWith('ethereum:')) {
+        resultType = 'payment';
+      } else if (codeLow.contains('begin:vevent') || codeLow.contains('begin:vcalendar')) {
+        resultType = 'event';
+      } else if (Uri.tryParse(code)?.hasScheme ?? false) {
         resultType = 'url';
       } else if (RegExp(r'^\+?[0-9]{7,15}$').hasMatch(code)) {
         resultType = 'phone';
@@ -301,6 +338,38 @@ class _ScannerScreenState extends State<ScannerScreen> {
           child: MobileScanner(
             controller: _controller,
             onDetect: _onDetect,
+            scanWindow: Rect.fromCenter(
+              center: Offset(
+                MediaQuery.of(context).size.width / 2, // Fixed center X
+                MediaQuery.of(context).size.height / 2, // Fixed center Y
+              ),
+              width: 250,
+              height: 250,
+            ),
+          ),
+        ),
+        // Neon Scan Line
+        Center(
+          child: Container(
+            width: 250,
+            height: 250,
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: 250,
+              height: 2.5,
+              decoration: BoxDecoration(
+                color: AppTheme.accent,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.accent.withValues(alpha: 0.8),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            )
+            .animate(onPlay: (controller) => controller.repeat(reverse: true))
+            .moveY(begin: 0, end: 250, duration: 2.seconds, curve: Curves.easeInOut),
           ),
         ),
         // Scan Frame
@@ -323,7 +392,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
           )
           .animate(onPlay: (controller) => controller.repeat())
           .shimmer(duration: 2.seconds, color: AppTheme.accent.withValues(alpha: 0.5))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1.seconds, curve: Curves.easeInOut),
+          .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1.seconds, curve: Curves.easeInOut)
+          .animate(target: _isPulseActive ? 1 : 0)
+          .shimmer(duration: 400.ms, color: Colors.white.withValues(alpha: 0.8))
+          .boxShadow(
+            begin: const BoxShadow(color: Colors.transparent),
+            end: BoxShadow(color: AppTheme.accent.withValues(alpha: 0.8), blurRadius: 40, spreadRadius: 8),
+            duration: 200.ms,
+          )
+          .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 200.ms, curve: Curves.easeOutBack),
         ),
         if (_isProcessingOCR)
           const Center(child: CircularProgressIndicator(color: AppTheme.accent)),
@@ -490,7 +567,27 @@ class _ScannerScreenState extends State<ScannerScreen> {
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
-        setState(() => _isScanModeQR = isQR);
+        if (_isScanModeQR == isQR) return;
+
+        setState(() {
+          _isScanModeQR = isQR;
+          
+          // Dispose old controller and create new one with optimized formats
+          final oldController = _controller;
+          _controller = MobileScannerController(
+            detectionSpeed: DetectionSpeed.unrestricted,
+            formats: isQR ? [BarcodeFormat.qrCode] : [
+              BarcodeFormat.code128,
+              BarcodeFormat.ean13,
+              BarcodeFormat.ean8,
+              BarcodeFormat.code39,
+              BarcodeFormat.upcA,
+              BarcodeFormat.upcE,
+            ],
+            torchEnabled: _isFlashOn,
+          );
+          oldController.dispose();
+        });
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

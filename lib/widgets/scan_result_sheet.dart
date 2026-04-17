@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -66,6 +67,54 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
     }
   }
 
+  ({IconData icon, Color color, String label, String description}) _analyzeSafety() {
+    final content = widget.content.toLowerCase();
+    
+    if (widget.resultType != 'url') {
+      return (
+        icon: Icons.verified_user_outlined,
+        color: AppTheme.accent,
+        label: 'Verified Format',
+        description: 'This ${widget.resultType} format follows standard structures.',
+      );
+    }
+
+    if (content.startsWith('https://')) {
+      // Check for common shorteners
+      final shorteners = ['bit.ly', 't.co', 'goo.gl', 'tinyurl.com', 'is.gd', 'buff.ly', 'rebrand.ly'];
+      if (shorteners.any((s) => content.contains(s))) {
+        return (
+          icon: Icons.warning_amber_rounded,
+          color: Colors.orangeAccent,
+          label: 'URL Masked',
+          description: 'This is a shortened URL. The actual destination is hidden.',
+        );
+      }
+      return (
+        icon: Icons.security,
+        color: Colors.greenAccent,
+        label: 'Secure Link',
+        description: 'This link uses modern encryption (HTTPS).',
+      );
+    }
+
+    if (content.startsWith('http://')) {
+      return (
+        icon: Icons.gpp_maybe_rounded,
+        color: Colors.redAccent,
+        label: 'Insecure Link',
+        description: 'Caution: This site uses unencrypted HTTP protocol.',
+      );
+    }
+
+    return (
+      icon: Icons.help_outline,
+      color: Colors.grey,
+      label: 'Unknown',
+      description: 'Unable to verify the safety profile of this content.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<HistoryProvider>();
@@ -73,13 +122,20 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
       content: widget.content, type: widget.type, resultType: widget.resultType, scannedAt: DateTime.now()
     ));
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      child: Column(
+    final safety = _analyzeSafety();
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppTheme.surface.withValues(alpha: 0.8),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            border: Border.all(color: AppTheme.accent.withValues(alpha: 0.2), width: 1.5),
+          ),
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -131,6 +187,37 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          // Smart Analysis Shield
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: safety.color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: safety.color.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(safety.icon, color: safety.color, size: 28),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Smart Analysis: ${safety.label}',
+                        style: TextStyle(color: safety.color, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      Text(
+                        safety.description,
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 24),
           _buildActionButtons(context, provider),
           const SizedBox(height: 32),
@@ -140,11 +227,12 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
           const SizedBox(height: 8),
         ],
       ),
+    ),
+    ),
     );
   }
 
   Widget _buildActionButtons(BuildContext context, HistoryProvider provider) {
-    bool isWiFi = widget.content.startsWith('WIFI:');
 
     return Column(
       children: [
@@ -166,7 +254,23 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
                   label: const Text('Call'),
                 ),
               ),
-            if (isWiFi)
+            if (widget.resultType == 'payment')
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _launchURL(widget.content),
+                  icon: const Icon(Icons.payments_rounded),
+                  label: const Text('Pay Now'),
+                ),
+              ),
+            if (widget.resultType == 'event')
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _launchURL('https://www.google.com/calendar/render?action=TEMPLATE&text=Scanned%20Event&details=${Uri.encodeComponent(widget.content)}'),
+                  icon: const Icon(Icons.calendar_today_rounded),
+                  label: const Text('Add to Schedule'),
+                ),
+              ),
+            if (widget.resultType == 'wifi')
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () async {
@@ -177,11 +281,11 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
                       );
                     }
                   },
-                  icon: const Icon(Icons.wifi),
+                  icon: const Icon(Icons.wifi_rounded),
                   label: const Text('Connect WiFi'),
                 ),
               ),
-            if (!isWiFi && (widget.resultType == 'text' || widget.resultType == 'email'))
+            if (widget.resultType == 'text' || widget.resultType == 'email')
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () => _copyToClipboard(context, widget.content),

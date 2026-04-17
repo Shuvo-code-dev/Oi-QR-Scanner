@@ -77,14 +77,24 @@ class HistoryProvider with ChangeNotifier {
   }
 
   Future<void> addScan(ScanHistory scan) async {
+    // 1. Check for duplicates in Batch Mode (Sequential)
     if (isBatchMode) {
-      // Prevent sequential duplicates
       if (batchScans.isNotEmpty && batchScans.last.content == scan.content) {
         return;
       }
       batchScans.add(scan);
       notifyListeners();
       return;
+    }
+
+    // 2. Check for duplicates in Normal Mode (Time-based filter)
+    // We check against the most recent scan in the history list (sorted by DESC)
+    if (_history.isNotEmpty) {
+      final lastScan = _history.first;
+      if (lastScan.content == scan.content && 
+          scan.scannedAt.difference(lastScan.scannedAt).inSeconds < 3) {
+        return; // Reject identical scan within 3 seconds
+      }
     }
 
     await DatabaseHelper.instance.insertScan(scan);

@@ -155,7 +155,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         final now = DateTime.now();
         if (code == _lastDetectedCode && 
             _lastDetectedAt != null && 
-            now.difference(_lastDetectedAt!).inSeconds < 1) {
+            now.difference(_lastDetectedAt!).inSeconds < 3) {
           return;
         }
         

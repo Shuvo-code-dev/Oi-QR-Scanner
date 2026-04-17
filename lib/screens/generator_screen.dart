@@ -9,6 +9,8 @@ import '../theme/app_theme.dart';
 import '../widgets/ad_banner_widget.dart';
 import 'package:gal/gal.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class GeneratorScreen extends StatefulWidget {
   const GeneratorScreen({super.key});
@@ -188,141 +190,203 @@ class _GeneratorScreenState extends State<GeneratorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return AnimationLimiter(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: AnimationConfiguration.toStaggeredList(
+            duration: const Duration(milliseconds: 600),
+            childAnimationBuilder: (widget) => SlideAnimation(
+              verticalOffset: 50.0,
+              child: FadeInAnimation(child: widget),
+            ),
+            children: [
+              _buildTypeSelector(),
+              const SizedBox(height: 24),
+              _buildGlassForm(),
+              const SizedBox(height: 32),
+              _buildGenerateButton(),
+              if (_isGenerated) ...[
+                const SizedBox(height: 32),
+                _buildColorSelector(),
+                const SizedBox(height: 40),
+                _buildGlassQrPreview(),
+                const SizedBox(height: 40),
+                _buildActionButtons(),
+              ],
+              const SizedBox(height: 40),
+              const AdBannerWidget(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeSelector() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _types.map((type) {
-                bool selected = _selectedType == type;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    selected: selected,
-                    label: Text(type),
-                    onSelected: (val) {
-                      HapticFeedback.selectionClick();
-                      _onInputChange();
-                      setState(() => _selectedType = type);
-                    },
-                    selectedColor: AppTheme.accent,
-                    checkmarkColor: Colors.white,
-                    labelStyle: TextStyle(
-                      color: selected ? Colors.white : AppTheme.textSecondary,
-                    ),
-                    backgroundColor: AppTheme.surface,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                );
-              }).toList(),
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: _types.map((type) {
+          bool selected = _selectedType == type;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              selected: selected,
+              label: Text(type),
+              onSelected: (val) {
+                HapticFeedback.selectionClick();
+                _onInputChange();
+                setState(() => _selectedType = type);
+              },
+              selectedColor: AppTheme.accent,
+              checkmarkColor: Colors.black,
+              labelStyle: TextStyle(
+                color: selected ? Colors.black : AppTheme.textSecondary,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              ),
+              backgroundColor: AppTheme.surface.withValues(alpha: 0.3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          _buildDynamicForm(),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () {
-              HapticFeedback.heavyImpact();
-              FocusScope.of(context).unfocus();
-              setState(() => _isGenerated = true);
-            },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: AppTheme.accent,
-              foregroundColor: Colors.black,
-            ),
-            child: const Text('GENERATE QR CODE', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          if (_isGenerated) ...[
-            const SizedBox(height: 32),
-            const Text('Custom Color', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-            const SizedBox(height: 8),
-            Row(
-              children: _colors.map((color) => Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    setState(() => _qrColor = color);
-                  },
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _qrColor == color ? Colors.white : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildGlassForm() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: _buildDynamicForm(),
+    );
+  }
+
+  Widget _buildGenerateButton() {
+    return ElevatedButton(
+      onPressed: () {
+        HapticFeedback.heavyImpact();
+        FocusScope.of(context).unfocus();
+        setState(() => _isGenerated = true);
+      },
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        backgroundColor: AppTheme.accent,
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      child: const Text('GENERATE QR CODE', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+    )
+    .animate(onPlay: (c) => c.repeat())
+    .shimmer(duration: 3.seconds, delay: 2.seconds, color: Colors.white.withValues(alpha: 0.3));
+  }
+
+  Widget _buildColorSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Custom Color', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        Row(
+          children: _colors.map((color) => Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() => _qrColor = color);
+              },
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: _qrColor == color ? Colors.white : Colors.transparent,
+                    width: 2.5,
                   ),
-                ),
-              )).toList(),
-            ),
-            const SizedBox(height: 40),
-            Center(
-              child: RepaintBoundary(
-                key: _qrKey,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: QrImageView(
-                    data: _getQrData(),
-                    version: QrVersions.auto,
-                    size: 200.0,
-                    gapless: false,
-                    eyeStyle: QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
-                      color: _qrColor,
-                    ),
-                    dataModuleStyle: QrDataModuleStyle(
-                      dataModuleShape: QrDataModuleShape.square,
-                      color: _qrColor,
-                    ),
-                  ),
+                  boxShadow: [
+                    if (_qrColor == color)
+                      BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 2),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 40),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _shareQrCode,
-                    icon: const Icon(Icons.share),
-                    label: const Text('Share'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _saveQrCode,
-                    icon: const Icon(Icons.download),
-                    label: const Text('Save'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      foregroundColor: AppTheme.textPrimary,
-                      side: const BorderSide(color: AppTheme.accent),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-              ],
+          )).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGlassQrPreview() {
+    return Center(
+      child: RepaintBoundary(
+        key: _qrKey,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(color: AppTheme.accent.withValues(alpha: 0.2), blurRadius: 30, spreadRadius: 5),
+            ],
+          ),
+          child: QrImageView(
+            data: _getQrData(),
+            version: QrVersions.auto,
+            size: 200.0,
+            gapless: false,
+            eyeStyle: QrEyeStyle(
+              eyeShape: QrEyeShape.square,
+              color: _qrColor,
             ),
-          ],
-          const SizedBox(height: 40),
-          const AdBannerWidget(),
-        ],
-      ),
+            dataModuleStyle: QrDataModuleStyle(
+              dataModuleShape: QrDataModuleShape.square,
+              color: _qrColor,
+            ),
+          ),
+        ),
+      ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: _shareQrCode,
+            icon: const Icon(Icons.share_rounded),
+            label: const Text('Share'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.surface,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: _saveQrCode,
+            icon: const Icon(Icons.download_rounded),
+            label: const Text('Save'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              foregroundColor: AppTheme.accent,
+              side: const BorderSide(color: AppTheme.accent, width: 1.5),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

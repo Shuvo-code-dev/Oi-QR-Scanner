@@ -9,6 +9,8 @@ import '../models/scan_history_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/scan_result_sheet.dart';
 import '../widgets/ad_banner_widget.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -46,13 +48,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 return _buildEmptyState(context);
               }
 
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: filteredHistory.length,
-                itemBuilder: (context, index) {
-                  final scan = filteredHistory[index];
-                  return _buildHistoryItem(context, provider, scan);
-                },
+              return AnimationLimiter(
+                child: MasonryGridView.count(
+                  padding: const EdgeInsets.all(16),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  itemCount: filteredHistory.length,
+                  itemBuilder: (context, index) {
+                    final scan = filteredHistory[index];
+                    return AnimationConfiguration.staggeredGrid(
+                      position: index,
+                      duration: const Duration(milliseconds: 500),
+                      columnCount: 2,
+                      child: ScaleAnimation(
+                        child: FadeInAnimation(
+                          child: _buildBentoItem(context, provider, scan),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           ),
@@ -204,21 +220,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _buildHistoryItem(BuildContext context, HistoryProvider provider, ScanHistory scan) {
-    return Dismissible(
-      key: Key(scan.id.toString()),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        color: Colors.redAccent,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      onDismissed: (_) => provider.deleteScan(scan.id!),
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ListTile(
+  Widget _buildBentoItem(BuildContext context, HistoryProvider provider, ScanHistory scan) {
+    // If it's a favorite, it takes full width (2 columns), otherwise 1
+    final isWide = scan.isFavorite;
+    
+    return RepaintBoundary(
+      child: Dismissible(
+        key: Key(scan.id.toString()),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Icon(Icons.delete, color: Colors.redAccent),
+        ),
+        onDismissed: (_) => provider.deleteScan(scan.id!),
+        child: GestureDetector(
           onTap: () {
+            HapticFeedback.mediumImpact();
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -230,52 +252,81 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             );
           },
-          leading: Container(
-            padding: const EdgeInsets.all(8),
+          child: Container(
+            constraints: BoxConstraints(minHeight: isWide ? 100 : 140),
             decoration: BoxDecoration(
-              color: AppTheme.accent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              _getCategoryIcon(scan.category),
-              color: AppTheme.accent,
-            ),
-          ),
-          title: Text(
-            scan.content,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Row(
-            children: [
-              Text(
-                DateFormat('dd MMM, hh:mm a').format(scan.scannedAt),
-                style: const TextStyle(fontSize: 11),
+              color: AppTheme.surface.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: scan.isFavorite ? AppTheme.accent.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.05),
+                width: 1.5,
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: Colors.white10,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  scan.category.toUpperCase(),
-                  style: const TextStyle(fontSize: 8, color: AppTheme.textSecondary),
-                ),
-              ),
-            ],
-          ),
-          trailing: IconButton(
-            icon: Icon(
-              scan.isFavorite ? Icons.star : Icons.star_border,
-              color: scan.isFavorite ? Colors.amber : Colors.white24,
             ),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              provider.toggleFavorite(scan);
-            },
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.accent.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_getCategoryIcon(scan.category), color: AppTheme.accent, size: 18),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        scan.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                        color: scan.isFavorite ? Colors.amber : Colors.white24,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        provider.toggleFavorite(scan);
+                      },
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  scan.content,
+                  maxLines: isWide ? 2 : 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isWide ? 15 : 13,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('MMM dd').format(scan.scannedAt),
+                      style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        scan.category.toUpperCase(),
+                        style: const TextStyle(fontSize: 8, color: AppTheme.textSecondary, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

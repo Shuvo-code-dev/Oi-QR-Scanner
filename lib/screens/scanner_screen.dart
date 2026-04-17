@@ -348,59 +348,70 @@ class _ScannerScreenState extends State<ScannerScreen> {
             ),
           ),
         ),
-        // Neon Scan Line
-        Center(
-          child: Container(
-            width: 250,
-            height: 250,
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: 250,
-              height: 2.5,
-              decoration: BoxDecoration(
-                color: AppTheme.accent,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.accent.withValues(alpha: 0.8),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                  ),
-                ],
+        // Blurry Shroud Backdrop
+        Positioned.fill(
+          child: CustomPaint(
+            painter: ScannerShroudPainter(
+              windowRect: Rect.fromCenter(
+                center: Offset(
+                  MediaQuery.of(context).size.width / 2,
+                  MediaQuery.of(context).size.height / 2,
+                ),
+                width: 250,
+                height: 250,
               ),
-            )
-            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-            .moveY(begin: 0, end: 250, duration: 2.seconds, curve: Curves.easeInOut),
+            ),
           ),
         ),
-        // Scan Frame
+        // Neon Brackets & Line
         Center(
-          child: Container(
+          child: SizedBox(
             width: 250,
             height: 250,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white24, width: 1),
-              borderRadius: BorderRadius.circular(24),
-            ),
             child: Stack(
               children: [
-                _buildCorner(top: 0, left: 0, isTop: true, isLeft: true),
-                _buildCorner(top: 0, right: 0, isTop: true, isRight: true),
-                _buildCorner(bottom: 0, left: 0, isBottom: true, isLeft: true),
-                _buildCorner(bottom: 0, right: 0, isBottom: true, isRight: true),
+                // Pulse Animation for Brackets
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _controller, // Using controller or a dedicated pulse
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: ScannerBracketsPainter(
+                          pulse: _isPulseActive ? 1.0 : 0.0,
+                          color: AppTheme.accent,
+                        ),
+                      );
+                    },
+                  )
+                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                  .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1200.ms, curve: Curves.easeInOut),
+                ),
+                // Neon Scan Line (Simplified but smoother)
+                Container(
+                  width: 250,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.accent.withValues(alpha: 0),
+                        AppTheme.accent,
+                        AppTheme.accent.withValues(alpha: 0),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.accent.withValues(alpha: 0.6),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                )
+                .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                .moveY(begin: 0, end: 250, duration: 2500.ms, curve: Curves.easeInOut),
               ],
             ),
-          )
-          .animate(onPlay: (controller) => controller.repeat())
-          .shimmer(duration: 2.seconds, color: AppTheme.accent.withValues(alpha: 0.5))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1.seconds, curve: Curves.easeInOut)
-          .animate(target: _isPulseActive ? 1 : 0)
-          .shimmer(duration: 400.ms, color: Colors.white.withValues(alpha: 0.8))
-          .boxShadow(
-            begin: const BoxShadow(color: Colors.transparent),
-            end: BoxShadow(color: AppTheme.accent.withValues(alpha: 0.8), blurRadius: 40, spreadRadius: 8),
-            duration: 200.ms,
-          )
-          .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 200.ms, curve: Curves.easeOutBack),
+          ),
         ),
         if (_isProcessingOCR)
           const Center(child: CircularProgressIndicator(color: AppTheme.accent)),
@@ -623,34 +634,66 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ),
     );
   }
+}
 
-  Widget _buildCorner({
-    double? top,
-    double? left,
-    double? right,
-    double? bottom,
-    bool isTop = false,
-    bool isLeft = false,
-    bool isRight = false,
-    bool isBottom = false,
-  }) {
-    return Positioned(
-      top: top,
-      left: left,
-      right: right,
-      bottom: bottom,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          border: Border(
-            top: isTop ? const BorderSide(color: AppTheme.accent, width: 4) : BorderSide.none,
-            left: isLeft ? const BorderSide(color: AppTheme.accent, width: 4) : BorderSide.none,
-            right: isRight ? const BorderSide(color: AppTheme.accent, width: 4) : BorderSide.none,
-            bottom: isBottom ? const BorderSide(color: AppTheme.accent, width: 4) : BorderSide.none,
-          ),
-        ),
-      ),
+class ScannerBracketsPainter extends CustomPainter {
+  final double pulse;
+  final Color color;
+  ScannerBracketsPainter({required this.pulse, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.8 + (pulse * 0.2))
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 6);
+
+    const double l = 40.0;
+    const double r = 24.0;
+
+    // Top Left
+    canvas.drawPath(Path()..moveTo(0, l)..lineTo(0, r)..quadraticBezierTo(0, 0, r, 0)..lineTo(l, 0), paint);
+    // Top Right
+    canvas.drawPath(Path()..moveTo(size.width - l, 0)..lineTo(size.width - r, 0)..quadraticBezierTo(size.width, 0, size.width, r)..lineTo(size.width, l), paint);
+    // Bottom Left
+    canvas.drawPath(Path()..moveTo(0, size.height - l)..lineTo(0, size.height - r)..quadraticBezierTo(0, size.height, r, size.height)..lineTo(l, size.height), paint);
+    // Bottom Right
+    canvas.drawPath(Path()..moveTo(size.width - l, size.height)..lineTo(size.width - r, size.height)..quadraticBezierTo(size.width, size.height, size.width, size.height - r)..lineTo(size.width, size.height - l), paint);
+  }
+
+  @override
+  bool shouldRepaint(ScannerBracketsPainter oldDelegate) => pulse != oldDelegate.pulse;
+}
+
+class ScannerShroudPainter extends CustomPainter {
+  final Rect windowRect;
+  ScannerShroudPainter({required this.windowRect});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final backgroundPath = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    final windowPath = Path()..addRRect(RRect.fromRectAndRadius(windowRect, const Radius.circular(24)));
+    
+    final shroudPath = Path.combine(PathOperation.difference, backgroundPath, windowPath);
+    
+    canvas.drawPath(
+      shroudPath,
+      Paint()..color = Colors.black.withValues(alpha: 0.7),
+    );
+
+    // Subtle inner glow on ROI edge
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(windowRect, const Radius.circular(24)),
+      Paint()
+        ..color = AppTheme.accent.withValues(alpha: 0.1)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 10),
     );
   }
+
+  @override
+  bool shouldRepaint(ScannerShroudPainter oldDelegate) => windowRect != oldDelegate.windowRect;
 }

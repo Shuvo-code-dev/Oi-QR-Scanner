@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -8,7 +8,6 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:google_mlkit_language_id/google_mlkit_language_id.dart';
 import '../theme/app_theme.dart';
 import '../providers/history_provider.dart';
-import '../models/scan_history_model.dart';
 import './ad_banner_widget.dart';
 
 class ScanResultSheet extends StatefulWidget {
@@ -80,7 +79,6 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
     }
 
     if (content.startsWith('https://')) {
-      // Check for common shorteners
       final shorteners = ['bit.ly', 't.co', 'goo.gl', 'tinyurl.com', 'is.gd', 'buff.ly', 'rebrand.ly'];
       if (shorteners.any((s) => content.contains(s))) {
         return (
@@ -117,211 +115,227 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<HistoryProvider>();
-    final scan = provider.history.firstWhere((s) => s.content == widget.content, orElse: () => ScanHistory(
-      content: widget.content, type: widget.type, resultType: widget.resultType, scannedAt: DateTime.now()
-    ));
-
     final safety = _analyzeSafety();
 
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppTheme.surface.withValues(alpha: 0.8),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            border: Border.all(color: AppTheme.accent.withValues(alpha: 0.2), width: 1.5),
-          ),
-          child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Scan Result',
-                style: Theme.of(context).textTheme.titleLarge,
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      snap: true,
+      builder: (context, scrollController) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.8),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1.5),
               ),
-              Row(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(24),
                 children: [
-                  IconButton(
-                    onPressed: () => provider.toggleFavorite(scan),
-                    icon: Icon(
-                      scan.isFavorite ? Icons.star : Icons.star_border,
-                      color: scan.isFavorite ? Colors.amber : Colors.white70,
+                  Center(
+                    child: Container(
+                      width: 50,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.white30,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
-                  ),
+                  const SizedBox(height: 24),
+                  _buildStatusHeader(safety),
+                  const SizedBox(height: 24),
+                  _buildContentCard(),
+                  const SizedBox(height: 32),
+                  _buildActionButtons(context, context.read<HistoryProvider>()),
+                  const SizedBox(height: 20),
+                  const AdBannerWidget(),
                 ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusHeader(({IconData icon, Color color, String label, String description}) safety) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: safety.color.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+            border: Border.all(color: safety.color.withValues(alpha: 0.3)),
+          ),
+          child: Icon(safety.icon, color: safety.color, size: 28),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Safety Shield',
+                style: TextStyle(color: safety.color, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 12),
+              ),
+              Text(
+                safety.label,
+                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white10),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  widget.content,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                if (_translatedText != null) ...[
-                  const Divider(height: 24, color: Colors.white10),
-                  const Text('Translation (Bengali):', style: TextStyle(fontSize: 12, color: AppTheme.accent)),
-                  const SizedBox(height: 4),
-                  Text(_translatedText!, style: const TextStyle(fontSize: 16, color: Colors.white)),
-                ],
-              ],
-            ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppTheme.surface.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(20),
           ),
-          const SizedBox(height: 16),
-          // Smart Analysis Shield
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: safety.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: safety.color.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              children: [
-                Icon(safety.icon, color: safety.color, size: 28),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Smart Analysis: ${safety.label}',
-                        style: TextStyle(color: safety.color, fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                      Text(
-                        safety.description,
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          child: Text(
+            widget.resultType.toUpperCase(),
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.accent),
           ),
-          const SizedBox(height: 24),
-          _buildActionButtons(context, provider),
-          const SizedBox(height: 32),
-          const Divider(height: 1, color: Colors.white12),
-          const SizedBox(height: 16),
-          const AdBannerWidget(),
-          const SizedBox(height: 8),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContentCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('SCANNED CONTENT', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          SelectableText(
+            widget.content,
+            style: const TextStyle(fontSize: 16, height: 1.5, fontWeight: FontWeight.w500),
+          ),
+          if (_translatedText != null) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Divider(color: Colors.white12),
+            ),
+            const Text('TRANSLATION (BENGALI)', style: TextStyle(fontSize: 10, color: AppTheme.accent, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(_translatedText!, style: const TextStyle(fontSize: 16, color: Colors.white)),
+          ],
         ],
       ),
-    ),
-    ),
     );
   }
 
   Widget _buildActionButtons(BuildContext context, HistoryProvider provider) {
-
     return Column(
       children: [
         Row(
           children: [
             if (widget.resultType == 'url')
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => _launchURL(widget.content),
-                  icon: const Icon(Icons.open_in_browser),
-                  label: const Text('Open'),
-                ),
-              ),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL(widget.content), icon: Icons.open_in_new_rounded, label: 'Open Link', isPrimary: true)),
             if (widget.resultType == 'phone')
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => _launchURL('tel:${widget.content}'),
-                  icon: const Icon(Icons.phone),
-                  label: const Text('Call'),
-                ),
-              ),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL('tel:${widget.content}'), icon: Icons.call_rounded, label: 'Call Now', isPrimary: true)),
             if (widget.resultType == 'payment')
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => _launchURL(widget.content),
-                  icon: const Icon(Icons.payments_rounded),
-                  label: const Text('Pay Now'),
-                ),
-              ),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL(widget.content), icon: Icons.payments_rounded, label: 'Pay Now', isPrimary: true)),
             if (widget.resultType == 'event')
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => _launchURL('https://www.google.com/calendar/render?action=TEMPLATE&text=Scanned%20Event&details=${Uri.encodeComponent(widget.content)}'),
-                  icon: const Icon(Icons.calendar_today_rounded),
-                  label: const Text('Add to Schedule'),
-                ),
-              ),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL('https://www.google.com/calendar/render?action=TEMPLATE&text=Scanned%20Event&details=${Uri.encodeComponent(widget.content)}'), icon: Icons.calendar_today_rounded, label: 'Schedule', isPrimary: true)),
             if (widget.resultType == 'wifi')
               Expanded(
-                child: ElevatedButton.icon(
+                child: _buildNeumorphicButton(
                   onPressed: () async {
                     final success = await provider.connectToWiFi(widget.content);
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(success ? 'Connected to WiFi' : 'Failed to connect')),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Connected to WiFi' : 'Failed to connect')));
                     }
                   },
-                  icon: const Icon(Icons.wifi_rounded),
-                  label: const Text('Connect WiFi'),
+                  icon: Icons.wifi_rounded,
+                  label: 'Connect WiFi',
+                  isPrimary: true,
                 ),
               ),
             if (widget.resultType == 'text' || widget.resultType == 'email')
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _copyToClipboard(context, widget.content), icon: Icons.copy_rounded, label: 'Copy Text', isPrimary: true)),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(child: _buildNeumorphicButton(onPressed: () => Share.share(_translatedText ?? widget.content), icon: Icons.share_rounded, label: 'Share')),
+            if (widget.type == 'ocr' && _translatedText == null) ...[
+              const SizedBox(width: 16),
               Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => _copyToClipboard(context, widget.content),
-                  icon: const Icon(Icons.copy),
-                  label: const Text('Copy'),
-                ),
-              ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => Share.share(_translatedText ?? widget.content),
-                icon: const Icon(Icons.share),
-                label: const Text('Share'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  foregroundColor: AppTheme.textPrimary,
-                  side: const BorderSide(color: AppTheme.accent),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-            if (widget.type == 'ocr') ...[
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: _isTranslating ? null : () => _translateText(widget.content),
-                  icon: _isTranslating 
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(Icons.translate),
-                  label: const Text('Translate'),
+                child: _buildNeumorphicButton(
+                  onPressed: _isTranslating ? () {} : () => _translateText(widget.content),
+                  icon: Icons.translate_rounded,
+                  label: _isTranslating ? 'Translating...' : 'Translate',
                 ),
               ),
             ],
+            const SizedBox(width: 16),
+            Expanded(child: _buildNeumorphicButton(onPressed: () => Navigator.pop(context), icon: Icons.close_rounded, label: 'Dismiss')),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildNeumorphicButton({required VoidCallback onPressed, required IconData icon, required String label, bool isPrimary = false}) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onPressed();
+      },
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: isPrimary ? AppTheme.accent : AppTheme.surface.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.05),
+              offset: const Offset(-1, -1),
+              blurRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              offset: const Offset(3, 3),
+              blurRadius: 8,
+            ),
+          ],
+          border: Border.all(
+            color: isPrimary ? AppTheme.accent : Colors.white.withValues(alpha: 0.05),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: isPrimary ? Colors.black : Colors.white70, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isPrimary ? Colors.black : Colors.white70,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -336,16 +350,8 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
 
   Future<void> _launchURL(String url) async {
     final uri = Uri.parse(url);
-    if (await _canLaunchUrl(uri)) {
+    if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
-    }
-  }
-
-  Future<bool> _canLaunchUrl(Uri uri) async {
-    try {
-      return await canLaunchUrl(uri);
-    } catch (_) {
-      return false;
     }
   }
 }

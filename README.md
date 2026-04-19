@@ -1,8 +1,7 @@
 <div align="center">
 
 <img src="https://img.shields.io/badge/Flutter-3.11.1+-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
-<img src="https://img.shields.io/badge/Android-API%2021+-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
-<img src="https://img.shields.io/badge/iOS-12.0+-000000?style=for-the-badge&logo=apple&logoColor=white" />
+
 <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
 
 <br/><br/>

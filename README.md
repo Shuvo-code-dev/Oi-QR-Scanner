@@ -71,10 +71,10 @@ flowchart LR
 <div align="center">
 <table>
   <tr>
-    <td align="center"><img src="PLAY_STORE_SCREENSHOT_1_URL" width="200" alt="Screenshot 1"/></td>
-    <td align="center"><img src="PLAY_STORE_SCREENSHOT_2_URL" width="200" alt="Screenshot 2"/></td>
-    <td align="center"><img src="PLAY_STORE_SCREENSHOT_3_URL" width="200" alt="Screenshot 3"/></td>
-    <td align="center"><img src="PLAY_STORE_SCREENSHOT_4_URL" width="200" alt="Screenshot 4"/></td>
+    <td align="center"><img src="https://play-lh.googleusercontent.com/uMHkHAQGAZmEGGCogibTHyp4qo3ekapTEiUgxR7FeLjErIGHn9W0ocfj4wdrSdYX6lBo-uPhAc5u6dxZeZ9OGds=w1052-h592-rw" width="200" alt="Screenshot 1"/></td>
+    <td align="center"><img src="https://play-lh.googleusercontent.com/IsRDXQneuykp8ei91iI6Tr3bcsNGhwPNLKyFGoZtnJ94e3S8-JdmME1J-LluMdWkYWy5dzNWotWivXc-uKwQEoE=w1052-h592-rw" width="200" alt="Screenshot 2"/></td>
+    <td align="center"><img src="https://play-lh.googleusercontent.com/iKwb0_7WYRZuHQ7qnLC05y8LLgEKAMMMsZ-tHmk7fDkBuwXOjVN_2K32z6w67GlViosStRUwXfnAqDNsU9OwqA=w1052-h592-rw" width="200" alt="Screenshot 3"/></td>
+    <td align="center"><img src="https://play-lh.googleusercontent.com/nSHigiT8e66o-_EF0B9ePicrjZz53TbWtvQ7UYv3moCtNKE8U4jg9D-L7eI3pxYRfVwCbXs3ZSHqkEIEEed59A=w1052-h592-rw" width="200" alt="Screenshot 4"/></td>
   </tr>
   <tr>
     <td align="center"><sub><b>🔍 Scan</b></sub></td>

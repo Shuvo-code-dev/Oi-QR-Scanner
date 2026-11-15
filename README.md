@@ -61,13 +61,6 @@ flowchart LR
 <img src="https://capsule-render.vercel.app/api?type=rect&color=0:1B5E20,100:81C784&height=3&section=header" width="100%"/>
 
 ## 📱 App Preview
-
-<!--
-  ═══ স্ক্রিনশট গ্যালারি (নিচের কমেন্ট খুলে লিংক বসান) ═══
-  Play Store পেজে স্ক্রিনশটে Right Click → "Copy image address"
-  প্রতিটা PLAY_STORE_SCREENSHOT_X_URL এর জায়গায় লিংক বসিয়ে
-  এই কমেন্টের <!-- এবং --> চিহ্ন সরিয়ে দিন।
-
 <div align="center">
 <table>
   <tr>

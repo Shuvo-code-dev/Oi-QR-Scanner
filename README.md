@@ -27,166 +27,175 @@
 <a href="#preview">Preview</a> &nbsp;•&nbsp;
 <a href="#highlights">Highlights</a> &nbsp;•&nbsp;
 <a href="#from-the-developer">Developer note</a> &nbsp;•&nbsp;
+<a href="#what-this-means-for-you">For you</a> &nbsp;•&nbsp;
 <a href="#faq">FAQ</a>
 </sub>
 
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
+
 ## What's new
+
+<sub>Two updates at a glance</sub>
 
 <table>
   <tr>
-    <td width="50%" align="center" valign="top">
+    <td align="center" valign="top" width="50%">
       <h3>🏷️ New name</h3>
-      <img src="https://img.shields.io/badge/Oi%20QR%20Scanner-E5E7EB?style=flat-square&labelColor=E5E7EB" alt="old"/>
-      &nbsp;→&nbsp;
-      <img src="https://img.shields.io/badge/Oi%20Scanner-10B981?style=flat-square" alt="new"/>
-      <br/>
-      A name that fits where the app is heading.<br/>
-      <sub>Only the name changes. The app is the same.</sub>
+      <img src="https://img.shields.io/badge/Oi%20QR%20Scanner-E5E7EB?style=flat-square&labelColor=E5E7EB" alt="old"/> &nbsp;→&nbsp; <img src="https://img.shields.io/badge/Oi%20Scanner-10B981?style=flat-square" alt="new"/><br/>A name that fits where the app is heading.<br/><sub>Only the name changes. The app is the same.</sub>
     </td>
-    <td width="50%" align="center" valign="top">
+    <td align="center" valign="top" width="50%">
       <h3>🔒 Closed source</h3>
-      <img src="https://img.shields.io/badge/Open%20source-E5E7EB?style=flat-square&labelColor=E5E7EB" alt="old"/>
-      &nbsp;→&nbsp;
-      <img src="https://img.shields.io/badge/Closed%20source-F87171?style=flat-square" alt="new"/>
-      <br/>
-      Current and future versions are no longer open source.<br/>
-      <sub>Previously published code stays under MIT.</sub>
+      <img src="https://img.shields.io/badge/Open%20source-E5E7EB?style=flat-square&labelColor=E5E7EB" alt="old"/> &nbsp;→&nbsp; <img src="https://img.shields.io/badge/Closed%20source-F87171?style=flat-square" alt="new"/><br/>Current and future versions are no longer open source.<br/><sub>Previously published code stays under MIT.</sub>
     </td>
   </tr>
 </table>
 
-**❗ The app has a new name, and the project is now closed source.**
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
 
 ## Preview
 
+<sub>A quick look inside the app</sub>
+
 <table>
   <tr>
-    <td align="center">
-      <img src="https://play-lh.googleusercontent.com/uMHkHAQGAZmEGGCogibTHyp4qo3ekapTEiUgxR7FeLjErIGHn9W0ocfj4wdrSdYX6lBo-uPhAc5u6dxZeZ9OGds=w1052-h592-rw" width="420" alt="Scan screen"/><br/>
-      <sub><b>Scan</b> · point, detect, done</sub>
+    <td align="center" valign="top" width="50%">
+      <img src="https://play-lh.googleusercontent.com/uMHkHAQGAZmEGGCogibTHyp4qo3ekapTEiUgxR7FeLjErIGHn9W0ocfj4wdrSdYX6lBo-uPhAc5u6dxZeZ9OGds=w1052-h592-rw" width="420" alt="Scan screen"/>
+      <h3>🔍 Scan</h3>
+      <sub>Point, detect, done</sub>
     </td>
-    <td align="center">
-      <img src="https://play-lh.googleusercontent.com/IsRDXQneuykp8ei91iI6Tr3bcsNGhwPNLKyFGoZtnJ94e3S8-JdmME1J-LluMdWkYWy5dzNWotWivXc-uKwQEoE=w1052-h592-rw" width="420" alt="History screen"/><br/>
-      <sub><b>History</b> · everything you scanned</sub>
+    <td align="center" valign="top" width="50%">
+      <img src="https://play-lh.googleusercontent.com/IsRDXQneuykp8ei91iI6Tr3bcsNGhwPNLKyFGoZtnJ94e3S8-JdmME1J-LluMdWkYWy5dzNWotWivXc-uKwQEoE=w1052-h592-rw" width="420" alt="History screen"/>
+      <h3>📜 History</h3>
+      <sub>Everything you scanned</sub>
     </td>
   </tr>
   <tr>
-    <td align="center">
-      <img src="https://play-lh.googleusercontent.com/iKwb0_7WYRZuHQ7qnLC05y8LLgEKAMMMsZ-tHmk7fDkBuwXOjVN_2K32z6w67GlViosStRUwXfnAqDNsU9OwqA=w1052-h592-rw" width="420" alt="Settings screen"/><br/>
-      <sub><b>Settings</b> · make it yours</sub>
+    <td align="center" valign="top" width="50%">
+      <img src="https://play-lh.googleusercontent.com/iKwb0_7WYRZuHQ7qnLC05y8LLgEKAMMMsZ-tHmk7fDkBuwXOjVN_2K32z6w67GlViosStRUwXfnAqDNsU9OwqA=w1052-h592-rw" width="420" alt="Settings screen"/>
+      <h3>⚙️ Settings</h3>
+      <sub>Make it yours</sub>
     </td>
-    <td align="center">
-      <img src="https://play-lh.googleusercontent.com/nSHigiT8e66o-_EF0B9ePicrjZz53TbWtvQ7UYv3moCtNKE8U4jg9D-L7eI3pxYRfVwCbXs3ZSHqkEIEEed59A=w1052-h592-rw" width="420" alt="Themes screen"/><br/>
-      <sub><b>Themes</b> · light, dark and more</sub>
+    <td align="center" valign="top" width="50%">
+      <img src="https://play-lh.googleusercontent.com/nSHigiT8e66o-_EF0B9ePicrjZz53TbWtvQ7UYv3moCtNKE8U4jg9D-L7eI3pxYRfVwCbXs3ZSHqkEIEEed59A=w1052-h592-rw" width="420" alt="Themes screen"/>
+      <h3>🌙 Themes</h3>
+      <sub>Light, dark and more</sub>
     </td>
   </tr>
 </table>
 
 <sub>More screenshots on <a href="https://play.google.com/store/apps/details?id=com.oi.scanner">Google Play</a></sub>
 
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
+
 ## Highlights
+
+<sub>Why people use it</sub>
 
 <table>
   <tr>
-    <td align="center" width="25%">
-      <h3>⚡</h3>
-      <b>Fast</b><br/>
-      <sub>Instant scanning</sub>
+    <td align="center" valign="top" width="25%">
+      <h3>⚡ Fast</h3>
+      Instant scanning
     </td>
-    <td align="center" width="25%">
-      <h3>🔒</h3>
-      <b>Private</b><br/>
-      <sub>Your data stays with you</sub>
+    <td align="center" valign="top" width="25%">
+      <h3>🔒 Private</h3>
+      Your data stays with you
     </td>
-    <td align="center" width="25%">
-      <h3>🪶</h3>
-      <b>Lightweight</b><br/>
-      <sub>Small app size</sub>
+    <td align="center" valign="top" width="25%">
+      <h3>🪶 Lightweight</h3>
+      Small app size
     </td>
-    <td align="center" width="25%">
-      <h3>🎯</h3>
-      <b>Accurate</b><br/>
-      <sub>Reliable detection</sub>
+    <td align="center" valign="top" width="25%">
+      <h3>🎯 Accurate</h3>
+      Reliable detection
     </td>
   </tr>
 </table>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
 
 ## From the developer
 
-<i>“Every project evolves. Here are two important updates I want to share with you.”</i><br/>
-<sub>— <b>Shuvo</b></sub>
-
-### 🔄 A new name
-
-**Oi QR Scanner** is now **Oi Scanner**.<br/>
-For a number of reasons, I decided to give the app a name that better represents its future direction.<br/>
-This is **only a name change**. The app you know is still the same underneath.
-
-<table>
-  <tr><td align="center">✅ Your data and settings are untouched</td></tr>
-  <tr><td align="center">✅ All features work exactly as before</td></tr>
-  <tr><td align="center">✅ No reinstall or re-download required</td></tr>
-</table>
-
-### 🔒 A change in licensing
-
-**Oi Scanner is no longer open source.**<br/>
-After careful consideration, I moved the project from open source to closed source.<br/>
-The source code is no longer publicly available, and I am no longer accepting contributions, forks, or pull requests.
-
-**⚠️ This applies to current and future versions only.**
-
-Thank you to everyone who supported, tested, and contributed during the open-source journey.<br/>
-This decision was not made lightly. 💚
-
-## What this means for you
+<sub>Two important updates</sub>
 
 <table>
   <tr>
-    <td align="center" width="33%" valign="top">
-      <h3>🟢 Existing users</h3>
-      Nothing changes.<br/>Keep using the app exactly as before.
+    <td align="center" colspan="2">
+      <h3>💬 A note from Shuvo</h3>
+      <i>“Every project evolves. Here are two important updates I want to share with you.”</i>
     </td>
-    <td align="center" width="33%" valign="top">
-      <h3>🟡 Future versions</h3>
-      Will no longer be open source.
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="50%">
+      <h3>🔄 A new name</h3>
+      <b>Oi QR Scanner</b> is now <b>Oi Scanner</b>.<br/>Only a name change. The app is still the same underneath.<br/><br/>✅ Your data and settings are untouched<br/>✅ All features work exactly as before<br/>✅ No reinstall or re-download required
     </td>
-    <td align="center" width="33%" valign="top">
-      <h3>🔵 Published code</h3>
-      Remains available under the <b>MIT License</b> it was released with.
+    <td align="center" valign="top" width="50%">
+      <h3>🔒 A change in licensing</h3>
+      <b>Oi Scanner is no longer open source.</b><br/>The source code is no longer public, and contributions, forks and pull requests are no longer accepted.<br/><br/>⚠️ Applies to <b>current and future versions</b> only.
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <h3>💚 Thank you</h3>
+      To everyone who supported, tested, and contributed during the open-source journey.<br/><sub>This decision was not made lightly.</sub>
     </td>
   </tr>
 </table>
 
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
+
+## What this means for you
+
+<sub>Pick the one that describes you</sub>
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%">
+      <h3>🟢 Existing users</h3>
+      Nothing changes.<br/>Keep using the app as before.
+    </td>
+    <td align="center" valign="top" width="33%">
+      <h3>🟡 Future versions</h3>
+      Will no longer be open source.
+    </td>
+    <td align="center" valign="top" width="33%">
+      <h3>🔵 Published code</h3>
+      Stays available under the <b>MIT License</b> it was released with.
+    </td>
+  </tr>
+</table>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
+
 ## FAQ
 
-<details>
-<summary><b>Do I need to reinstall the app?</b></summary>
-<br/>
-No. Just keep using it. Updates arrive through Google Play as usual.
-<br/><br/>
-</details>
+<sub>Quick answers</sub>
 
-<details>
-<summary><b>Will my data be lost?</b></summary>
-<br/>
-No. Your data and settings remain exactly as they were.
-<br/><br/>
-</details>
+<table>
+  <tr>
+    <td align="center" valign="top" width="50%">
+      <h3>📲 Need to reinstall?</h3>
+      No. Just keep using it. Updates arrive through Google Play as usual.
+    </td>
+    <td align="center" valign="top" width="50%">
+      <h3>💾 Will my data be lost?</h3>
+      No. Your data and settings remain exactly as they were.
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="50%">
+      <h3>📂 Old open-source code?</h3>
+      Yes. Code released before this change stays available under the MIT License.
+    </td>
+    <td align="center" valign="top" width="50%">
+      <h3>🤝 Can I contribute?</h3>
+      Contributions, forks and pull requests are no longer accepted for current and future versions.
+    </td>
+  </tr>
+</table>
 
-<details>
-<summary><b>Can I still use the old open-source code?</b></summary>
-<br/>
-Yes. Code released before this change stays available under the MIT License.
-<br/><br/>
-</details>
-
-<details>
-<summary><b>Can I contribute or open pull requests?</b></summary>
-<br/>
-Contributions, forks and pull requests are no longer accepted for current and future versions.
-<br/><br/>
-</details>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:A7F3D0,100:34D399&height=3&section=header" width="100%" alt=""/>
 
 <a href="https://play.google.com/store/apps/details?id=com.oi.scanner">
   <img src="https://img.shields.io/badge/Get%20Oi%20Scanner-10B981?style=for-the-badge&logo=googleplay&logoColor=white" alt="Get Oi Scanner" height="42"/>

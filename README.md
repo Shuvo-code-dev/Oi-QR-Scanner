@@ -2,7 +2,6 @@
 
 <div align="center">
 
-<!-- ═══ HERO (auto light / dark) ═══ -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=soft&color=0:064E3B,50:059669,100:34D399&height=190&section=header&text=Oi%20Scanner&fontSize=56&fontColor=ffffff&fontAlignY=40&desc=Scan%20smart.%20Stay%20private.&descSize=18&descAlignY=66&descColor=D1FAE5">
   <img src="https://capsule-render.vercel.app/api?type=soft&color=0:D1FAE5,50:A7F3D0,100:6EE7B7&height=190&section=header&text=Oi%20Scanner&fontSize=56&fontColor=064E3B&fontAlignY=40&desc=Scan%20smart.%20Stay%20private.&descSize=18&descAlignY=66&descColor=047857" width="100%" alt="Oi Scanner">
@@ -31,13 +30,11 @@
 <a href="#faq">FAQ</a>
 </sub>
 
-</div>
-
 ## What's new
 
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td width="50%" align="center" valign="top">
       <h3>🏷️ New name</h3>
       <img src="https://img.shields.io/badge/Oi%20QR%20Scanner-E5E7EB?style=flat-square&labelColor=E5E7EB" alt="old"/>
       &nbsp;→&nbsp;
@@ -46,7 +43,7 @@
       A name that fits where the app is heading.<br/>
       <sub>Only the name changes. The app is the same.</sub>
     </td>
-    <td width="50%" valign="top">
+    <td width="50%" align="center" valign="top">
       <h3>🔒 Closed source</h3>
       <img src="https://img.shields.io/badge/Open%20source-E5E7EB?style=flat-square&labelColor=E5E7EB" alt="old"/>
       &nbsp;→&nbsp;
@@ -58,8 +55,7 @@
   </tr>
 </table>
 
-> [!IMPORTANT]
-> The app has a **new name**, and the project is now **closed source**. Details [below](#from-the-developer).
+**❗ The app has a new name, and the project is now closed source.**
 
 ## Preview
 
@@ -86,9 +82,7 @@
   </tr>
 </table>
 
-<div align="center">
-  <sub>More screenshots on <a href="https://play.google.com/store/apps/details?id=com.oi.scanner">Google Play</a></sub>
-</div>
+<sub>More screenshots on <a href="https://play.google.com/store/apps/details?id=com.oi.scanner">Google Play</a></sub>
 
 ## Highlights
 
@@ -119,68 +113,80 @@
 
 ## From the developer
 
-> *Every project evolves. Here are two important updates I want to share with you.*
->
-> — **Shuvo**
+<i>“Every project evolves. Here are two important updates I want to share with you.”</i><br/>
+<sub>— <b>Shuvo</b></sub>
 
 ### 🔄 A new name
 
-**Oi QR Scanner** is now **Oi Scanner**. For a number of reasons, I decided to give the app a name that better represents its future direction. This is **only a name change**. The app you know is still the same underneath.
+**Oi QR Scanner** is now **Oi Scanner**.<br/>
+For a number of reasons, I decided to give the app a name that better represents its future direction.<br/>
+This is **only a name change**. The app you know is still the same underneath.
 
-| | |
-|:-:|:--|
-| ✅ | Your data and settings are untouched |
-| ✅ | All features work exactly as before |
-| ✅ | No reinstall or re-download required |
+<table>
+  <tr><td align="center">✅ Your data and settings are untouched</td></tr>
+  <tr><td align="center">✅ All features work exactly as before</td></tr>
+  <tr><td align="center">✅ No reinstall or re-download required</td></tr>
+</table>
 
 ### 🔒 A change in licensing
 
-**Oi Scanner is no longer open source.** After careful consideration, I moved the project from open source to closed source. The source code is no longer publicly available, and I am no longer accepting contributions, forks, or pull requests.
+**Oi Scanner is no longer open source.**<br/>
+After careful consideration, I moved the project from open source to closed source.<br/>
+The source code is no longer publicly available, and I am no longer accepting contributions, forks, or pull requests.
 
-> [!WARNING]
-> This applies to **current and future versions** only.
+**⚠️ This applies to current and future versions only.**
 
-Thank you to everyone who supported, tested, and contributed during the open-source journey. This decision was not made lightly. 💚
+Thank you to everyone who supported, tested, and contributed during the open-source journey.<br/>
+This decision was not made lightly. 💚
 
 ## What this means for you
 
-| You are | What changes |
-|:--|:--|
-| 🟢 **An existing user** | Nothing. Keep using the app exactly as before. |
-| 🟡 **Following future versions** | They will no longer be open source. |
-| 🔵 **Using previously published code** | It remains available under the **MIT License** it was released with. |
+<table>
+  <tr>
+    <td align="center" width="33%" valign="top">
+      <h3>🟢 Existing users</h3>
+      Nothing changes.<br/>Keep using the app exactly as before.
+    </td>
+    <td align="center" width="33%" valign="top">
+      <h3>🟡 Future versions</h3>
+      Will no longer be open source.
+    </td>
+    <td align="center" width="33%" valign="top">
+      <h3>🔵 Published code</h3>
+      Remains available under the <b>MIT License</b> it was released with.
+    </td>
+  </tr>
+</table>
 
 ## FAQ
 
 <details>
 <summary><b>Do I need to reinstall the app?</b></summary>
-
+<br/>
 No. Just keep using it. Updates arrive through Google Play as usual.
-
+<br/><br/>
 </details>
 
 <details>
 <summary><b>Will my data be lost?</b></summary>
-
+<br/>
 No. Your data and settings remain exactly as they were.
-
+<br/><br/>
 </details>
 
 <details>
 <summary><b>Can I still use the old open-source code?</b></summary>
-
+<br/>
 Yes. Code released before this change stays available under the MIT License.
-
+<br/><br/>
 </details>
 
 <details>
 <summary><b>Can I contribute or open pull requests?</b></summary>
-
+<br/>
 Contributions, forks and pull requests are no longer accepted for current and future versions.
-
+<br/><br/>
 </details>
-
-<div align="center">
 
 <a href="https://play.google.com/store/apps/details?id=com.oi.scanner">
   <img src="https://img.shields.io/badge/Get%20Oi%20Scanner-10B981?style=for-the-badge&logo=googleplay&logoColor=white" alt="Get Oi Scanner" height="42"/>
